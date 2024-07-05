@@ -1,45 +1,19 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, Animated, Dimensions } from 'react-native';
-import useGenres from '../hooks/useGenres';
-import GenreIcon from './GenreIcon';
-import CrossIcon from './CrossIcon';
-
-const { width } = Dimensions.get('window');
+import React from 'react';
+import { View, Text, TouchableOpacity, FlatList, Modal, Animated } from 'react-native';
+import GenreIcon from './icons/GenreIcon';
+import CrossIcon from './icons/CrossIcon';
+import { useMenu } from './utils/MenuUtils'; // Import the menu utility
+import { lightStyles, darkStyles } from './styles/MenuStyles'; // Import the styles
 
 const Menu: React.FC<{ onGenreSelect: (genreId: number, genreName: string) => void }> = ({ onGenreSelect }) => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const slideAnim = useRef(new Animated.Value(-width)).current;
-  const { genres } = useGenres();
-
-  const handleGenrePress = (id: number, name: string) => {
-    onGenreSelect(id, name);
-    closeMenu();
-  };
-
-  const openMenu = () => {
-    setModalVisible(true);
-    Animated.timing(slideAnim, {
-      toValue: 0,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const closeMenu = () => {
-    Animated.timing(slideAnim, {
-      toValue: -width,
-      duration: 300,
-      useNativeDriver: true,
-    }).start(() => {
-      setModalVisible(false);
-    });
-  };
+  const { modalVisible, slideAnim, genres, isDarkTheme, styles, openMenu, closeMenu, handleGenrePress } = useMenu(onGenreSelect);
+  const themeStyles = styles === 'dark' ? darkStyles : lightStyles; // Choose the styles based on the theme
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.iconButton} onPress={openMenu}>
+    <View style={themeStyles.container}>
+      <TouchableOpacity style={themeStyles.iconButton} onPress={openMenu}>
         <GenreIcon size={40} />
-        <Text style={styles.iconText}></Text>
+        <Text style={themeStyles.iconText}>Genres</Text>
       </TouchableOpacity>
       <Modal
         visible={modalVisible}
@@ -47,16 +21,16 @@ const Menu: React.FC<{ onGenreSelect: (genreId: number, genreName: string) => vo
         animationType="none"
         onRequestClose={closeMenu}
       >
-        <Animated.View style={[styles.modalContainer, { transform: [{ translateX: slideAnim }] }]}>
-          <TouchableOpacity style={styles.closeButton} onPress={closeMenu}>
-            <CrossIcon size={24} color="#fff" />
+        <Animated.View style={[themeStyles.modalContainer, { transform: [{ translateX: slideAnim }] }]}>
+          <TouchableOpacity style={themeStyles.closeButton} onPress={closeMenu}>
+            <CrossIcon size={24} color={isDarkTheme ? '#fff' : '#000'} />
           </TouchableOpacity>
           <FlatList
             data={genres}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <TouchableOpacity onPress={() => handleGenrePress(item.id, item.name)}>
-                <Text style={styles.genreItem}>{item.name}</Text>
+                <Text style={themeStyles.genreItem}>{item.name}</Text>
               </TouchableOpacity>
             )}
           />
@@ -65,43 +39,5 @@ const Menu: React.FC<{ onGenreSelect: (genreId: number, genreName: string) => vo
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  iconButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  iconText: {
-    color: '#1E90FF',
-    fontSize: 18,
-    marginLeft: 5,
-  },
-  modalContainer: {
-    flex: 1,
-    width: width,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    padding: 20,
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-  },
-  closeButton: {
-    alignSelf: 'flex-end',
-    marginBottom: 20,
-  },
-  genreItem: {
-    color: '#fff',
-    fontSize: 18,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#444',
-  },
-});
 
 export default Menu;

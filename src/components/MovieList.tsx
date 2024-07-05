@@ -1,5 +1,7 @@
 import React from 'react';
-import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, Image, TouchableOpacity } from 'react-native';
+import { getIsDarkTheme } from '../theme/ThemeManager'; // Import the global theme manager
+import { lightStyles, darkStyles } from './styles/MovieListStyles'; // Import the separated styles
 
 interface Movie {
   id: number;
@@ -14,6 +16,9 @@ interface MovieListProps {
 }
 
 const MovieList: React.FC<MovieListProps> = ({ title, movies, onMoviePress }) => {
+  const isDarkTheme = getIsDarkTheme(); // Get the current theme state
+  const styles = isDarkTheme ? darkStyles : lightStyles; // Choose the styles based on the theme
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>
@@ -35,32 +40,5 @@ const MovieList: React.FC<MovieListProps> = ({ title, movies, onMoviePress }) =>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 10,
-  },
-  movieContainer: {
-    marginRight: 10,
-    width: 100,
-  },
-  image: {
-    width: 100,
-    height: 150,
-    borderRadius: 10,
-  },
-  movieTitle: {
-    color: '#fff',
-    fontSize: 14,
-    textAlign: 'center',
-    marginTop: 5,
-  },
-});
 
 export default MovieList;

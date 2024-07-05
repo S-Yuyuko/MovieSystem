@@ -1,33 +1,25 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import React from 'react';
+import { View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import useGenreMovies from '../hooks/useGenreMovies';
-import BackArrow from '../components/BackArrow';
+import BackArrow from '../components/icons/BackArrow';
 import MovieDetailsDrawer from '../components/MovieDetailsDrawer';
+import { lightStyles, darkStyles } from './styles/GenreMoviesStyles'; // Import the styles
 
 const GenreMoviesScreen: React.FC<{ genreId: number; genreName: string; onNavigate: (screen: string, params?: any) => void }> = ({ genreId, genreName, onNavigate }) => {
-  const movies = useGenreMovies(genreId);
-  const isLoading = !movies.length;
-  const [selectedMovieId, setSelectedMovieId] = useState<number | null>(null);
-
-  const handleMoviePress = (id: number) => {
-    setSelectedMovieId(id);
-  };
-
-  const closeDrawer = () => {
-    setSelectedMovieId(null);
-  };
+  const { movies, loading, selectedMovieId, handleMoviePress, closeDrawer, isDarkTheme } = useGenreMovies(genreId);
+  const styles = isDarkTheme ? darkStyles : lightStyles;
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>{genreName} Movies</Text>
         <TouchableOpacity style={styles.backButton} onPress={() => onNavigate('Home')}>
-          <BackArrow size={24} color="#fff" />
+          <BackArrow size={24} color={isDarkTheme ? '#fff' : '#000'} />
         </TouchableOpacity>
       </View>
-      {isLoading ? (
+      {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#1E90FF" />
+          <ActivityIndicator size="large" color={styles.activityIndicator.color} />
         </View>
       ) : (
         <FlatList
@@ -59,55 +51,5 @@ const GenreMoviesScreen: React.FC<{ genreId: number; genreName: string; onNaviga
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#121212',
-    padding: 10,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  backButton: {
-    marginLeft: 10,
-  },
-  title: {
-    color: '#fff',
-    fontSize: 24,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  movieItem: {
-    flexDirection: 'row',
-    marginBottom: 20,
-    backgroundColor: '#1e1e1e',
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
-  movieImage: {
-    width: 100,
-    height: 150,
-  },
-  movieDetails: {
-    flex: 1,
-    padding: 10,
-  },
-  movieTitle: {
-    color: '#fff',
-    fontSize: 18,
-    marginBottom: 5,
-  },
-  movieOverview: {
-    color: '#ccc',
-    fontSize: 14,
-  },
-});
 
 export default GenreMoviesScreen;

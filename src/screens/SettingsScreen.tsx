@@ -1,86 +1,59 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView } from 'react-native';
-import Loading from '../components/Loading';
-import { useTheme } from '../context/ThemeContext';
+import React, { useState } from 'react';
+import { View, Text, Switch, ScrollView, TouchableOpacity } from 'react-native';
+import { setIsDarkTheme, getIsDarkTheme } from '../theme/ThemeManager'; // Import the theme manager
+import { lightStyles, darkStyles } from './styles/SettingsScreenStyles'; // Import the styles
 
 const SettingsScreen: React.FC = () => {
-  const [loading, setLoading] = useState(true);
-  const { isDarkTheme, theme, toggleTheme } = useTheme();
+  const [isDark, setIsDark] = useState(getIsDarkTheme());
+
+  const handleToggleTheme = () => {
+    setIsDarkTheme(!isDark);
+    setIsDark(!isDark);
+  };
+
+  const styles = isDark ? darkStyles : lightStyles; // Choose the styles based on the theme
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: theme.background }]}>
-      <Text style={[styles.title, { color: theme.text }]}>Settings</Text>
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>Settings</Text>
 
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: theme.text }]}>Appearance</Text>
+        <Text style={styles.sectionTitle}>Appearance</Text>
         <View style={styles.option}>
-          <Text style={[styles.optionText, { color: theme.text }]}>Dark Theme</Text>
+          <Text style={styles.optionText}>Dark Theme</Text>
           <Switch
-            value={isDarkTheme}
-            onValueChange={toggleTheme}
-            trackColor={{ false: theme.switchTrack, true: theme.primary }}
-            thumbColor={isDarkTheme ? theme.switchThumb : theme.switchThumb}
+            value={isDark}
+            onValueChange={handleToggleTheme}
+            trackColor={{ false: '#767577', true: '#81b0ff' }}
+            thumbColor={isDark ? '#f4f3f4' : '#f4f3f4'}
           />
         </View>
       </View>
 
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: theme.text }]}>Notifications</Text>
+        <Text style={styles.sectionTitle}>Notifications</Text>
         <View style={styles.option}>
-          <Text style={[styles.optionText, { color: theme.text }]}>Enable Notifications</Text>
+          <Text style={styles.optionText}>Enable Notifications</Text>
           <Switch
             value={true} // Replace with actual state and handler
             onValueChange={() => {}}
-            trackColor={{ false: theme.switchTrack, true: theme.primary }}
-            thumbColor={true ? theme.switchThumb : theme.switchThumb}
+            trackColor={{ false: '#767577', true: '#81b0ff' }}
+            thumbColor={'#f4f3f4'}
           />
         </View>
       </View>
 
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: theme.text }]}>About</Text>
+        <Text style={styles.sectionTitle}>About</Text>
         <TouchableOpacity style={styles.option}>
-          <Text style={[styles.optionText, { color: theme.text }]}>Terms of Service</Text>
+          <Text style={styles.optionText}>Terms of Service</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.option}>
-          <Text style={[styles.optionText, { color: theme.text }]}>Privacy Policy</Text>
+          <Text style={styles.optionText}>Privacy Policy</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  section: {
-    marginBottom: 30,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  option: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#1E1E1E',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  optionText: {
-    fontSize: 16,
-  },
-});
 
 export default SettingsScreen;
